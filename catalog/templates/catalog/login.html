@@ -1,0 +1,162 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Login - ShopHub{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-5 fw-bold mb-3">Welcome Back</h1>
+                <p class="lead text-muted">Sign in to your account to continue shopping</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Login Form -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-person-circle text-primary" style="font-size: 3rem;"></i>
+                            <h3 class="fw-bold mt-3">Sign In</h3>
+                            <p class="text-muted">Enter your credentials to access your account</p>
+                        </div>
+                        
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <!-- Username/Email -->
+                            <div class="mb-3">
+                                <label for="username" class="form-label fw-bold">
+                                    <i class="bi bi-person me-2"></i>Username or Email
+                                </label>
+                                <input type="text" name="username" id="username" class="form-control" 
+                                       placeholder="Enter your username or email" required>
+                            </div>
+                            
+                            <!-- Password -->
+                            <div class="mb-3">
+                                <label for="password" class="form-label fw-bold">
+                                    <i class="bi bi-lock me-2"></i>Password
+                                </label>
+                                <input type="password" name="password" id="password" class="form-control" 
+                                       placeholder="Enter your password" required>
+                            </div>
+                            
+                            <!-- Remember Me & Forgot Password -->
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="remember">
+                                        <label class="form-check-label small" for="remember">
+                                            Remember me
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <a href="#" class="text-decoration-none small">Forgot password?</a>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="d-grid mb-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                                </button>
+                            </div>
+                            
+                            <!-- Divider -->
+                            <div class="text-center mb-4">
+                                <span class="text-muted">or continue with</span>
+                            </div>
+                            
+                            <!-- Social Login Buttons -->
+                            <div class="row g-2 mb-4">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-secondary w-100">
+                                        <i class="bi bi-google me-2"></i>Google
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-secondary w-100">
+                                        <i class="bi bi-facebook me-2"></i>Facebook
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Sign Up Link -->
+                            <div class="text-center">
+                                <p class="mb-0">
+                                    Don't have an account? 
+                                    <a href="{% url 'catalog:register' %}" class="text-decoration-none fw-bold">
+                                        Sign up here
+                                    </a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Additional Info -->
+                <div class="text-center mt-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="bi bi-shield-check text-success me-2"></i>
+                                <span class="small">Secure Login</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="bi bi-clock text-primary me-2"></i>
+                                <span class="small">24/7 Access</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <i class="bi bi-headset text-info me-2"></i>
+                                <span class="small">Support</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4 text-center">
+                <div class="mb-3">
+                    <i class="bi bi-truck text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h6 class="fw-bold">Fast Delivery</h6>
+                <p class="text-muted small">Get your orders delivered quickly and securely</p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="mb-3">
+                    <i class="bi bi-shield-check text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h6 class="fw-bold">Secure Shopping</h6>
+                <p class="text-muted small">Your data and payments are always protected</p>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="mb-3">
+                    <i class="bi bi-arrow-clockwise text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h6 class="fw-bold">Easy Returns</h6>
+                <p class="text-muted small">Hassle-free returns and exchanges</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

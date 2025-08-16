@@ -1,0 +1,227 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Products - ShopHub{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-5 fw-bold mb-3">Our Products</h1>
+                <p class="lead text-muted">Discover amazing products at great prices</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search and Filter Section -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="search-box">
+                    <form method="get" action="{% url 'catalog:product_list' %}">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <input type="text" name="search_query" class="form-control" 
+                                       placeholder="Search products..." 
+                                       value="{{ search_form.search_query.value|default:'' }}">
+                            </div>
+                            <div class="col-md-3">
+                                <select name="category" class="form-select">
+                                    <option value="">All Categories</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.name }}" 
+                                                {% if search_form.category.value == category.name %}selected{% endif %}>
+                                            {{ category.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="number" name="min_price" class="form-control" 
+                                       placeholder="Min Price" 
+                                       value="{{ search_form.min_price.value|default:'' }}">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="number" name="max_price" class="form-control" 
+                                       placeholder="Max Price" 
+                                       value="{{ search_form.max_price.value|default:'' }}">
+                            </div>
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Products Grid -->
+<section class="py-5">
+    <div class="container">
+        <!-- Results Summary -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <p class="text-muted mb-0">
+                    Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} products
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="text-muted mb-0">
+                    {% if search_form.search_query.value or search_form.category.value or search_form.min_price.value or search_form.max_price.value %}
+                        <a href="{% url 'catalog:product_list' %}" class="text-decoration-none">
+                            <i class="bi bi-x-circle me-1"></i>Clear filters
+                        </a>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Products -->
+        <div class="row g-4">
+            {% for product in page_obj %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card product-card h-100">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center">
+                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            <span class="category-badge">{{ product.category.name }}</span>
+                        </div>
+                        <h5 class="card-title fw-bold">{{ product.name }}</h5>
+                        <p class="card-text text-muted">{{ product.description|truncatewords:20 }}</p>
+                        
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="price-tag">${{ product.price }}</span>
+                                {% if product.is_in_stock %}
+                                    <span class="badge bg-success">In Stock</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Out of Stock</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'catalog:product_detail' product.id %}" class="btn btn-outline-primary">
+                                    <i class="bi bi-eye me-2"></i>View Details
+                                </a>
+                                {% if product.is_in_stock %}
+                                    <form method="post" action="{% url 'catalog:add_to_cart' product.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="quantity" value="1">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="bi bi-cart-plus me-2"></i>Add to Cart
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <div class="py-5">
+                    <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+                    <h4 class="mt-3 text-muted">No products found</h4>
+                    <p class="text-muted">
+                        {% if search_form.search_query.value or search_form.category.value or search_form.min_price.value or search_form.max_price.value %}
+                            Try adjusting your search criteria or 
+                            <a href="{% url 'catalog:product_list' %}" class="text-decoration-none">browse all products</a>
+                        {% else %}
+                            No products are available at the moment.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <nav aria-label="Product pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search_form.search_query.value %}&search_query={{ search_form.search_query.value }}{% endif %}{% if search_form.category.value %}&category={{ search_form.category.value }}{% endif %}{% if search_form.min_price.value %}&min_price={{ search_form.min_price.value }}{% endif %}{% if search_form.max_price.value %}&max_price={{ search_form.max_price.value }}{% endif %}">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_form.search_query.value %}&search_query={{ search_form.search_query.value }}{% endif %}{% if search_form.category.value %}&category={{ search_form.category.value }}{% endif %}{% if search_form.min_price.value %}&min_price={{ search_form.min_price.value }}{% endif %}{% if search_form.max_price.value %}&max_price={{ search_form.max_price.value }}{% endif %}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if search_form.search_query.value %}&search_query={{ search_form.search_query.value }}{% endif %}{% if search_form.category.value %}&category={{ search_form.category.value }}{% endif %}{% if search_form.min_price.value %}&min_price={{ search_form.min_price.value }}{% endif %}{% if search_form.max_price.value %}&max_price={{ search_form.max_price.value }}{% endif %}">
+                                        {{ num }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_form.search_query.value %}&search_query={{ search_form.search_query.value }}{% endif %}{% if search_form.category.value %}&category={{ search_form.category.value }}{% endif %}{% if search_form.min_price.value %}&min_price={{ search_form.min_price.value }}{% endif %}{% if search_form.max_price.value %}&max_price={{ search_form.max_price.value }}{% endif %}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_form.search_query.value %}&search_query={{ search_form.search_query.value }}{% endif %}{% if search_form.category.value %}&category={{ search_form.category.value }}{% endif %}{% if search_form.min_price.value %}&min_price={{ search_form.min_price.value }}{% endif %}{% if search_form.max_price.value %}&max_price={{ search_form.max_price.value }}{% endif %}">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Categories Quick Access -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h3 class="fw-bold">Shop by Category</h3>
+                <p class="text-muted">Quick access to your favorite categories</p>
+            </div>
+        </div>
+        
+        <div class="row g-3 justify-content-center">
+            {% for category in categories %}
+            <div class="col-auto">
+                <a href="{% url 'catalog:category_products' category.id %}" 
+                   class="btn btn-outline-primary rounded-pill">
+                    {{ category.name }}
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

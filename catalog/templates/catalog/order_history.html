@@ -1,0 +1,268 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Order History - ShopHub{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-5 fw-bold mb-3">Order History</h1>
+                <p class="lead text-muted">Track all your previous orders and their status</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Order History Content -->
+<section class="py-5">
+    <div class="container">
+        {% if page_obj %}
+            <!-- Orders List -->
+            <div class="row">
+                {% for order in page_obj %}
+                <div class="col-12 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 py-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h6 class="fw-bold mb-1">
+                                        <i class="bi bi-receipt me-2"></i>Order #{{ order.order_number }}
+                                    </h6>
+                                    <small class="text-muted">{{ order.created_at|date:"F d, Y, g:i A" }}</small>
+                                </div>
+                                <div class="col-md-3 text-md-center">
+                                    <span class="badge 
+                                        {% if order.status == 'pending' %}bg-warning
+                                        {% elif order.status == 'processing' %}bg-info
+                                        {% elif order.status == 'shipped' %}bg-primary
+                                        {% elif order.status == 'delivered' %}bg-success
+                                        {% elif order.status == 'cancelled' %}bg-danger
+                                        {% endif %} fs-6">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </div>
+                                <div class="col-md-3 text-md-end">
+                                    <h6 class="fw-bold text-primary mb-0">${{ order.total_amount }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Order Items Preview -->
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <h6 class="fw-bold mb-2">Order Items</h6>
+                                    <div class="row g-2">
+                                        {% for item in order.items.all|slice:":3" %}
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center p-2 bg-light rounded">
+                                                <div class="bg-white rounded me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                    <i class="bi bi-box text-muted small"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold small">{{ item.product_name }}</div>
+                                                    <div class="text-muted small">Qty: {{ item.quantity }}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                        {% if order.items.count > 3 %}
+                                        <div class="col-md-4">
+                                            <div class="d-flex align-items-center justify-content-center p-2 bg-light rounded">
+                                                <span class="text-muted small">+{{ order.items.count|add:"-3" }} more items</span>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="fw-bold mb-2">Shipping Address</h6>
+                                    <p class="text-muted small mb-0">
+                                        {{ order.shipping_city }}, {{ order.shipping_state }}<br>
+                                        {{ order.shipping_country }}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a href="{% url 'catalog:order_detail' order.id %}" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye me-1"></i>View Details
+                                    </a>
+                                </div>
+                                <div class="text-muted small">
+                                    {% if order.status == 'delivered' %}
+                                        <i class="bi bi-check-circle text-success me-1"></i>Delivered on {{ order.updated_at|date:"M d, Y" }}
+                                    {% elif order.status == 'shipped' %}
+                                        <i class="bi bi-truck text-primary me-1"></i>Shipped on {{ order.updated_at|date:"M d, Y" }}
+                                    {% elif order.status == 'processing' %}
+                                        <i class="bi bi-gear text-info me-1"></i>Processing since {{ order.updated_at|date:"M d, Y" }}
+                                    {% elif order.status == 'pending' %}
+                                        <i class="bi bi-clock text-warning me-1"></i>Order placed on {{ order.created_at|date:"M d, Y" }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+            <div class="row mt-5">
+                <div class="col-12">
+                    <nav aria-label="Order history pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">
+                                        <i class="bi bi-chevron-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                        <i class="bi bi-chevron-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                        <i class="bi bi-chevron-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            {% endif %}
+            
+        {% else %}
+            <!-- No Orders -->
+            <div class="row justify-content-center">
+                <div class="col-lg-6 text-center">
+                    <div class="py-5">
+                        <i class="bi bi-receipt text-muted" style="font-size: 5rem;"></i>
+                        <h3 class="mt-4 text-muted">No Orders Yet</h3>
+                        <p class="text-muted mb-4">You haven't placed any orders yet. Start shopping to see your order history here!</p>
+                        <div class="d-grid gap-2 d-md-block">
+                            <a href="{% url 'catalog:product_list' %}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-shop me-2"></i>Start Shopping
+                            </a>
+                            <a href="{% url 'catalog:home' %}" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-house me-2"></i>Go Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Order Status Guide -->
+{% if page_obj %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h3 class="fw-bold">Order Status Guide</h3>
+                <p class="text-muted">Understanding what each status means</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="text-center">
+                    <div class="mb-2">
+                        <i class="bi bi-clock text-warning" style="font-size: 2rem;"></i>
+                    </div>
+                    <h6 class="fw-bold">Pending</h6>
+                    <p class="text-muted small">Order received, processing begins</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="text-center">
+                    <div class="mb-2">
+                        <i class="bi bi-gear text-info" style="font-size: 2rem;"></i>
+                    </div>
+                    <h6 class="fw-bold">Processing</h6>
+                    <p class="text-muted small">Order is being prepared</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="text-center">
+                    <div class="mb-2">
+                        <i class="bi bi-truck text-primary" style="font-size: 2rem;"></i>
+                    </div>
+                    <h6 class="fw-bold">Shipped</h6>
+                    <p class="text-muted small">Order is on its way</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="text-center">
+                    <div class="mb-2">
+                        <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <h6 class="fw-bold">Delivered</h6>
+                    <p class="text-muted small">Order has arrived</p>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="text-center">
+                    <div class="mb-2">
+                        <i class="bi bi-x-circle text-danger" style="font-size: 2rem;"></i>
+                    </div>
+                    <h6 class="fw-bold">Cancelled</h6>
+                    <p class="text-muted small">Order was cancelled</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Call to Action -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h3 class="fw-bold mb-4">Ready for Your Next Order?</h3>
+                <p class="lead text-muted mb-4">
+                    Discover new products and amazing deals in our catalog.
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{% url 'catalog:product_list' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-shop me-2"></i>Browse Products
+                    </a>
+                    <a href="{% url 'catalog:home' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-house me-2"></i>Go Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

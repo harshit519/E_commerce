@@ -1,0 +1,271 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Shopping Cart - ShopHub{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-5 fw-bold mb-3">Shopping Cart</h1>
+                <p class="lead text-muted">Review your items and proceed to checkout</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Cart Content -->
+<section class="py-5">
+    <div class="container">
+        {% if cart and cart_items %}
+            <div class="row">
+                <!-- Cart Items -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 py-3">
+                            <h5 class="fw-bold mb-0">
+                                <i class="bi bi-cart3 me-2"></i>Cart Items ({{ cart.item_count }})
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            {% for item in cart_items %}
+                            <div class="cart-item p-4 border-bottom {% if forloop.last %}border-0{% endif %}">
+                                <div class="row align-items-center">
+                                    <!-- Product Image -->
+                                    <div class="col-md-2 col-4 mb-3 mb-md-0">
+                                        {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" class="img-fluid rounded" alt="{{ item.product.name }}">
+                                        {% else %}
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 80px;">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Product Info -->
+                                    <div class="col-md-4 col-8 mb-3 mb-md-0">
+                                        <h6 class="fw-bold mb-1">{{ item.product.name }}</h6>
+                                        <p class="text-muted small mb-1">{{ item.product.category.name }}</p>
+                                        <span class="price-tag">${{ item.product.price }}</span>
+                                    </div>
+                                    
+                                    <!-- Quantity Controls -->
+                                    <div class="col-md-3 mb-3 mb-md-0">
+                                        <form method="post" action="{% url 'catalog:update_cart_item' item.id %}" class="d-flex align-items-center">
+                                            {% csrf_token %}
+                                            <label for="quantity-{{ item.id }}" class="form-label me-2 mb-0">Qty:</label>
+                                            <input type="number" name="quantity" id="quantity-{{ item.id }}" 
+                                                   class="form-control form-control-sm" 
+                                                   value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" 
+                                                   style="width: 70px;">
+                                            <button type="submit" class="btn btn-outline-primary btn-sm ms-2">
+                                                <i class="bi bi-arrow-clockwise"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                    
+                                    <!-- Item Total -->
+                                    <div class="col-md-2 mb-3 mb-md-0 text-md-center">
+                                        <h6 class="fw-bold text-primary">${{ item.total_price }}</h6>
+                                    </div>
+                                    
+                                    <!-- Remove Button -->
+                                    <div class="col-md-1 text-md-end">
+                                        <form method="post" action="{% url 'catalog:remove_from_cart' item.id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                                    onclick="return confirm('Are you sure you want to remove this item?')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Cart Summary -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="fw-bold mb-0">
+                                <i class="bi bi-calculator me-2"></i>Order Summary
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span>${{ cart.total_price }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping:</span>
+                                <span class="text-success">Free</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <strong>Total:</strong>
+                                <strong class="fs-5 text-primary">${{ cart.total_price }}</strong>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'catalog:checkout' %}" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-credit-card me-2"></i>Proceed to Checkout
+                                </a>
+                                <a href="{% url 'catalog:product_list' %}" class="btn btn-outline-primary">
+                                    <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+                                </a>
+                            </div>
+                            
+                            <!-- Shipping Info -->
+                            <div class="mt-4 p-3 bg-light rounded">
+                                <h6 class="fw-bold mb-2">
+                                    <i class="bi bi-truck me-2"></i>Free Shipping
+                                </h6>
+                                <p class="small text-muted mb-0">Free shipping on orders over $50. Estimated delivery: 3-5 business days.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty Cart Warning -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="alert alert-info border-0">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-info-circle me-3 fs-4"></i>
+                            <div>
+                                <strong>Need help?</strong> If you have any questions about your order, please contact our customer support team.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        {% else %}
+            <!-- Empty Cart -->
+            <div class="row justify-content-center">
+                <div class="col-lg-6 text-center">
+                    <div class="py-5">
+                        <i class="bi bi-cart-x text-muted" style="font-size: 5rem;"></i>
+                        <h3 class="mt-4 text-muted">Your cart is empty</h3>
+                        <p class="text-muted mb-4">Looks like you haven't added any products to your cart yet.</p>
+                        <div class="d-grid gap-2 d-md-block">
+                            <a href="{% url 'catalog:product_list' %}" class="btn btn-primary btn-lg">
+                                <i class="bi bi-shop me-2"></i>Start Shopping
+                            </a>
+                            <a href="{% url 'catalog:home' %}" class="btn btn-outline-primary btn-lg">
+                                <i class="bi bi-house me-2"></i>Go Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Recommended Products -->
+{% if cart and cart_items %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h3 class="fw-bold">You Might Also Like</h3>
+                <p class="text-muted">Add more items to your cart</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <!-- This would typically show recommended products based on cart contents -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card product-card h-100">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title fw-bold">Sample Product</h6>
+                        <p class="card-text text-muted small">This is a sample product description.</p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="price-tag">$29.99</span>
+                                <span class="badge bg-success small">In Stock</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-cart-plus me-1"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="card product-card h-100">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title fw-bold">Another Product</h6>
+                        <p class="card-text text-muted small">Another great product for you.</p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="price-tag">$39.99</span>
+                                <span class="badge bg-success small">In Stock</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-cart-plus me-1"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="card product-card h-100">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title fw-bold">Special Offer</h6>
+                        <p class="card-text text-muted small">Limited time special offer product.</p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="price-tag">$19.99</span>
+                                <span class="badge bg-warning small">Limited</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-cart-plus me-1"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6">
+                <div class="card product-card h-100">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title fw-bold">Best Seller</h6>
+                        <p class="card-text text-muted small">Our most popular product.</p>
+                        <div class="mt-auto">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="price-tag">$49.99</span>
+                                <span class="badge bg-danger small">Hot</span>
+                            </div>
+                            <button class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-cart-plus me-1"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
