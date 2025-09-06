@@ -1,0 +1,270 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Checkout - ShopHub{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-5 fw-bold mb-3">Checkout</h1>
+                <p class="lead text-muted">Complete your order and secure checkout</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Checkout Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Checkout Form -->
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-truck me-2"></i>Shipping Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <!-- Shipping Address -->
+                            <div class="mb-4">
+                                <label for="{{ form.shipping_address.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-geo-alt me-2"></i>Shipping Address
+                                </label>
+                                {{ form.shipping_address }}
+                                {% if form.shipping_address.errors %}
+                                    <div class="text-danger small mt-1">{{ form.shipping_address.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- City and State -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="{{ form.shipping_city.id_for_label }}" class="form-label fw-bold">
+                                        <i class="bi bi-building me-2"></i>City
+                                    </label>
+                                    {{ form.shipping_city }}
+                                    {% if form.shipping_city.errors %}
+                                        <div class="text-danger small mt-1">{{ form.shipping_city.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.shipping_state.id_for_label }}" class="form-label fw-bold">
+                                        <i class="bi bi-map me-2"></i>State/Province
+                                    </label>
+                                    {{ form.shipping_state }}
+                                    {% if form.shipping_state.errors %}
+                                        <div class="text-danger small mt-1">{{ form.shipping_state.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- ZIP Code and Country -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label for="{{ form.shipping_zip_code.id_for_label }}" class="form-label fw-bold">
+                                        <i class="bi bi-pin-map me-2"></i>ZIP/Postal Code
+                                    </label>
+                                    {{ form.shipping_zip_code }}
+                                    {% if form.shipping_zip_code.errors %}
+                                        <div class="text-danger small mt-1">{{ form.shipping_zip_code.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.shipping_country.id_for_label }}" class="form-label fw-bold">
+                                        <i class="bi bi-globe me-2"></i>Country
+                                    </label>
+                                    {{ form.shipping_country }}
+                                    {% if form.shipping_country.errors %}
+                                        <div class="text-danger small mt-1">{{ form.shipping_country.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Phone Number -->
+                            <div class="mb-4">
+                                <label for="{{ form.phone_number.id_for_label }}" class="form-label fw-bold">
+                                    <i class="bi bi-telephone me-2"></i>Phone Number
+                                </label>
+                                {{ form.phone_number }}
+                                {% if form.phone_number.errors %}
+                                    <div class="text-danger small mt-1">{{ form.phone_number.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">We'll use this to contact you about your order.</div>
+                            </div>
+                            
+                            <!-- Payment Information -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold mb-3">
+                                    <i class="bi bi-credit-card me-2"></i>Payment Information
+                                </h6>
+                                <div class="alert alert-info border-0">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-info-circle me-3 fs-4"></i>
+                                        <div>
+                                            <strong>Secure Payment:</strong> Your payment information is encrypted and secure. 
+                                            We accept all major credit cards and PayPal.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Sample Payment Form (for demo purposes) -->
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Card Number</label>
+                                        <input type="text" class="form-control" placeholder="1234 5678 9012 3456" disabled>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Expiry Date</label>
+                                        <input type="text" class="form-control" placeholder="MM/YY" disabled>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">CVV</label>
+                                        <input type="text" class="form-control" placeholder="123" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Terms and Conditions -->
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms" required>
+                                    <label class="form-check-label" for="terms">
+                                        I agree to the <a href="#" class="text-decoration-none">Terms and Conditions</a> and 
+                                        <a href="#" class="text-decoration-none">Privacy Policy</a>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-lock me-2"></i>Place Order Securely
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm sticky-top" style="top: 100px;">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="fw-bold mb-0">
+                            <i class="bi bi-calculator me-2"></i>Order Summary
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Cart Items Summary -->
+                        <div class="mb-3">
+                            <h6 class="fw-bold mb-2">Items in Cart ({{ cart.item_count }})</h6>
+                            {% for item in cart.items.all %}
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex align-items-center">
+                                    {% if item.product.image %}
+                                        <img src="{{ item.product.image.url }}" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-image text-muted small"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="fw-bold small">{{ item.product.name }}</div>
+                                        <div class="text-muted small">Qty: {{ item.quantity }}</div>
+                                    </div>
+                                </div>
+                                <span class="fw-bold">${{ item.total_price }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Price Breakdown -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span>${{ cart.total_price }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Shipping:</span>
+                                <span class="text-success">Free</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tax:</span>
+                                <span>$0.00</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-3">
+                                <strong>Total:</strong>
+                                <strong class="fs-5 text-primary">${{ cart.total_price }}</strong>
+                            </div>
+                        </div>
+                        
+                        <!-- Shipping Info -->
+                        <div class="mb-3 p-3 bg-light rounded">
+                            <h6 class="fw-bold mb-2">
+                                <i class="bi bi-truck me-2"></i>Shipping Details
+                            </h6>
+                            <p class="small text-muted mb-1">Free shipping on orders over $50</p>
+                            <p class="small text-muted mb-0">Estimated delivery: 3-5 business days</p>
+                        </div>
+                        
+                        <!-- Security Badge -->
+                        <div class="text-center">
+                            <div class="d-flex justify-content-center gap-2 mb-2">
+                                <i class="bi bi-shield-check text-success fs-4"></i>
+                                <i class="bi bi-lock text-success fs-4"></i>
+                                <i class="bi bi-credit-card text-success fs-4"></i>
+                            </div>
+                            <p class="small text-muted mb-0">Secure SSL Encrypted Checkout</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Security Features -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6 text-center">
+                <div class="mb-3">
+                    <i class="bi bi-shield-check text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h6 class="fw-bold">Secure Payment</h6>
+                <p class="text-muted small">256-bit SSL encryption</p>
+            </div>
+            <div class="col-lg-3 col-md-6 text-center">
+                <div class="mb-3">
+                    <i class="bi bi-truck text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h6 class="fw-bold">Fast Delivery</h6>
+                <p class="text-muted small">3-5 business days</p>
+            </div>
+            <div class="col-lg-3 col-md-6 text-center">
+                <div class="mb-3">
+                    <i class="bi bi-arrow-clockwise text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h6 class="fw-bold">Easy Returns</h6>
+                <p class="text-muted small">30-day return policy</p>
+            </div>
+            <div class="col-lg-3 col-md-6 text-center">
+                <div class="mb-3">
+                    <i class="bi bi-headset text-primary" style="font-size: 2.5rem;"></i>
+                </div>
+                <h6 class="fw-bold">24/7 Support</h6>
+                <p class="text-muted small">Always here to help</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
